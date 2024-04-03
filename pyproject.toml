@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "unithon-backend-11"
+version = "0.1.0"
+description = ""
+authors = ["Daco2020 <dacokim32@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.110.1"
+uvicorn = "^0.29.0"
+orjson = "^3.10.0"
+pyjwt = "^2.8.0"
+pydantic-settings = "^2.2.1"
+requests = "^2.31.0"
+
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.7.0"
+pytest-sugar = "^1.0.0"
+pytest-asyncio = "^0.23.6"
+pytest-mock = "^3.14.0"
+pytest = "^8.1.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
