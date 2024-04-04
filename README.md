@@ -1,6 +1,22 @@
-# backend
+# team9-api
 
+## Requirements
+* Python 3.11.4
+* Poetry **
+* Docker & Docker Compose
+* (Optional) Postgresql **
+
+## Conventions
+### Branches
+* `main (default)`: (~~) 으로 배포
+* `feature/{description}`: 새로운 기능이 추가되는 경우에 사용
+* `refactor/{description}`: 기능 변경 없이 코드 리팩토링만을 하는 경우에 사용
+* `fix/{description}`: `main` 브랜치로 반영하는 사소한 오류 수정 시에 사용
+
+### PR Merge Rules
+* default: *Squash and merge*
 <br><br>
+# Dev Guidelines
 
 ## 가상 환경
 
@@ -68,7 +84,14 @@ pre-commit install
 
 <br><br>
 
-## 서버 실행
+## Server Startup
+Docker Compose를 활용하여 FastAPI 서버를 실행합니다
+```
+docker-compose up
+```
+
+
+쉘 스크립트로 실행하려면 아래와 같이
 
 스크립트 권한을 추가합니다.
 
@@ -89,6 +112,8 @@ scripts/dev.sh
 ```
 
 <br><br>
+## Deployment
+main 브랜치에 새로운 push가 일어날 때마다, Github Actions를 통해 자동으로 배포가 이루어집니다.
 
 ## API 명세
 
