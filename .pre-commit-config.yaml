@@ -13,6 +13,7 @@ repos:
     rev: v1.8.0
     hooks:
       - id: "mypy"
+        exclude: "(alembic)/"
         additional_dependencies:
           [
             "fastapi",

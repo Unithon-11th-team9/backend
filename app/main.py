@@ -1,6 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
+from typing import Awaitable, Callable
+from app.base.db import db
 
 from app.exception_handlers import add_exception_handlers
 
@@ -32,6 +34,20 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    @app.middleware("http")
+    async def db_session_middleware(
+        request: Request, call_next: Callable[[Request], Awaitable[Response]]
+    ) -> Response:
+        """request마다 session을 유지하기 위해 사용"""
+        if request.url.path in NO_DB_ROUTES:
+            return await call_next(request)
+
+        response = Response("Internal server error", status_code=500)
+        async with db.session() as session:
+            request.state.session = session
+            response = await call_next(request)
+        return response
 
     add_exception_handlers(app)
     init_views(app)

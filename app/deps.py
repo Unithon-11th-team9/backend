@@ -1,13 +1,23 @@
-from fastapi import Cookie
+from fastapi import Cookie, Depends, Request
 
+from app import dto
 from app.base.auth import decode_token
 from app.exceptions import NotFoundError, PermissionError
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.repositories.user import UserRepository
+from app.services.user import UserService
+
+
+def session(request: Request) -> AsyncSession:
+    return request.state.session
 
 
 async def current_user(
+    user_repo: UserRepository = Depends(UserRepository),
     access_token: str = Cookie(default=None),
     refresh_token: str = Cookie(default=None),
-) -> int:
+) -> dto.UserProfile:
     if access_token or refresh_token:
         try:
             result = decode_token(access_token)
@@ -20,11 +30,20 @@ async def current_user(
                 )
 
         user_id = result.get("user_id", None)
-        if not user_id:
+        user = await user_repo.get(user_id=user_id)
+        if not user:
             raise NotFoundError(f"{user_id} 유저가 존재하지 않습니다.")
-        return user_id  # TODO: 유저 객체 반환하도록 변경 예정
+        return user.profile
 
     else:
         raise PermissionError(
             f"{access_token=}, {refresh_token=} 토큰이 유효하지 않습니다."
         )
+
+
+def user_repo(session: AsyncSession = Depends(session)) -> UserRepository:
+    return UserRepository(session)
+
+
+def user_service(user_repo: UserRepository = Depends(user_repo)) -> UserService:
+    return UserService(user_repo)

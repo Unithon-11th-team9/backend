@@ -1,1 +1,18 @@
-# API 인풋, 아웃풋 스키마를 비롯하여 데이터 전송 객체를 정의하는 파일입니다.
+import datetime
+from typing import Any
+from pydantic import BaseModel, Field
+
+from app.base.utils import tz_now
+
+
+class UserProfile(BaseModel):
+    id: int = Field(description="유저 아이디", examples=[1])
+    name: str = Field(description="이름", examples=["홍길동"])
+    email: str = Field(description="이메일", examples=["user@email.com"])
+    profile_image_url: Any = Field(
+        description="프로필 이미지 URL",
+        examples=["https://www.google.com"],
+        default=None,
+    )
+    created_at: datetime.datetime = Field(description="생성일시", examples=[tz_now()])
+    updated_at: datetime.datetime = Field(description="변경일시", examples=[tz_now()])
