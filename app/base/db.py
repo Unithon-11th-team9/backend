@@ -15,7 +15,7 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-from app.base.config import settings
+from app.base.config import DB_URL
 
 
 class Base(DeclarativeBase):
@@ -70,4 +70,4 @@ class DB:
             await self._session_factory.remove()
 
 
-db = DB(str(settings.db_url))
+db = DB(str(DB_URL))

@@ -13,8 +13,16 @@ def session(request: Request) -> AsyncSession:
     return request.state.session
 
 
+def user_repo(session: AsyncSession = Depends(session)) -> UserRepository:
+    return UserRepository(session)
+
+
+def user_service(user_repo: UserRepository = Depends(user_repo)) -> UserService:
+    return UserService(user_repo)
+
+
 async def current_user(
-    user_repo: UserRepository = Depends(UserRepository),
+    user_repo: UserRepository = Depends(user_repo),
     access_token: str = Cookie(default=None),
     refresh_token: str = Cookie(default=None),
 ) -> dto.UserProfile:
@@ -39,11 +47,3 @@ async def current_user(
         raise PermissionError(
             f"{access_token=}, {refresh_token=} 토큰이 유효하지 않습니다."
         )
-
-
-def user_repo(session: AsyncSession = Depends(session)) -> UserRepository:
-    return UserRepository(session)
-
-
-def user_service(user_repo: UserRepository = Depends(user_repo)) -> UserService:
-    return UserService(user_repo)

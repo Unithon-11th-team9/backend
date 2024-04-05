@@ -1,5 +1,5 @@
-from typing import Any
 from app import dto
+from app.base.provider import ProviderUserInfo
 from app.exceptions import NotFoundError
 from app.orm import User
 from app.repositories.user import UserRepository
@@ -10,7 +10,7 @@ class UserService:
         self._user_repo = user_repo
 
     async def get_or_create_user(
-        self, provider: str, provider_data: dict[str, Any]
+        self, provider: str, provider_data: ProviderUserInfo
     ) -> dto.UserProfile:
         """기존 유저를 가져오거나 없다면 생성합니다."""
         user = await self._user_repo.get(uid=provider_data["uid"])
@@ -21,9 +21,9 @@ class UserService:
                 User(
                     uid=provider_data["uid"],
                     provider=provider,
-                    name=provider_data["name"],
-                    email=provider_data["email"],
-                    profile_image_url=provider_data["picture"],
+                    name=provider_data.get("name"),
+                    email=provider_data.get("email"),
+                    profile_image_url=provider_data.get("profile_image_url"),
                 )
             )
             return user.profile

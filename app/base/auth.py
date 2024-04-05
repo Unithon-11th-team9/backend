@@ -2,7 +2,7 @@ import datetime
 from typing import Any
 
 from fastapi import Response
-from app.base.config import settings
+from app.base.config import SECRET_KEY
 
 import jwt
 
@@ -20,7 +20,7 @@ def create_token(
     payload["iss"] = issuer
     payload["iat"] = iat = tz_now()
     payload["exp"] = iat + expires_delta
-    return jwt.encode(payload, settings.secret_key, algorithm=algorithm)
+    return jwt.encode(payload, SECRET_KEY, algorithm=algorithm)
 
 
 def decode_token(token: str, algorithm: str = "HS256") -> dict[str, Any]:
@@ -28,7 +28,7 @@ def decode_token(token: str, algorithm: str = "HS256") -> dict[str, Any]:
     options = {"verify_exp": True, "verify_iss": True}
     return jwt.decode(
         token,
-        settings.secret_key,
+        SECRET_KEY,
         options=options,
         issuer=issuer,
         algorithms=[algorithm],
@@ -49,7 +49,7 @@ def _set_cookie(response: Response, key: str, value: str) -> None:
         key=key,
         value=value,
         max_age=60 * 60 * 24 * 30,  # 30일
-        domain="localhost",  # TODO: 클라이언트 도메인으로 변경 예정
+        # domain="", # 도메인을 추가하면 해당 도메인에서만 쿠키를 받을 수 있음.
         path="/",
         httponly=True,
         secure=True,
