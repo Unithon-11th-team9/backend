@@ -16,7 +16,7 @@ jobs:
       uses: mr-smithers-excellent/docker-build-push@v6
       with:
         image: ${{ secrets.DOCKER_REPOSITORY }}
-        tags: ${{ secrets.tag }}
+        tags: latest
         registry: docker.io
         dockerfile: Dockerfile
         username: ${{ secrets.DOCKER_USERNAME }}
@@ -40,6 +40,16 @@ jobs:
           script: |
             mkdir -p /home/ubuntu/srv/ubuntu
 
+      - name: pull docker image
+        uses: appleboy/ssh-action@
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            cd /home/ubuntu/srv/ubuntu
+            docker pull ${{ secrets.DOCKER_REPOSITORY }}:latest
+
       - name: executing remote ssh commands using password # 서버에 접속하여 Docker image pull 및 컨테이너 시작
         uses: appleboy/ssh-action@master
         with:
@@ -51,17 +61,13 @@ jobs:
             
             docker stop $(docker ps -a -q)         
             
-            export DB_HOST=${{ secrets.DB_HOST }}
-            export DB_USER=${{ secrets.DB_USER }}
-            export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-            export DB_PORT=${{ secrets.DB_PORT }}
-            export DB=${{ secrets.DB }}
+            export DB_URL = ${{ secrets.DB_URL }}
           
             export CREDENTIAL_ALGORITHM=${{ secrets.CREDENTIAL_ALGORITHM }}
             export CREDENTIAL_SECRET=${{ secrets.CREDENTIAL_SECRET }}
             
-            docker pull ${{ secrets.DOCKER_REPOSITORY }}:${{ secrets.DOCKER_TAG }}
+            docker pull ${{ secrets.DOCKER_REPOSITORY }}:latest
             
             docker run \
             -d -p 8000:80 \
-            ${{ secrets.DOCKER_REPOSITORY }}:${{ secrets.DOCKER_TAG }}
+            ${{ secrets.DOCKER_REPOSITORY }}:latest
