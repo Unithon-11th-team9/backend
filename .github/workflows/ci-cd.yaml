@@ -41,7 +41,7 @@ jobs:
             mkdir -p /home/ubuntu/srv/ubuntu
 
       - name: pull docker image
-        uses: appleboy/ssh-action@
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
