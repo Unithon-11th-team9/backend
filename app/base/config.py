@@ -1,14 +1,10 @@
-from pydantic_settings import BaseSettings
+import dotenv
+import os
 
 
-class Settings(BaseSettings):
-    secret_key: str
-    db_url: str
+dotenv.load_dotenv("./secrets/.env", override=True)
 
-    class Config:
-        env_file = "./secrets/.env"
-        env_file_encoding = "utf-8"
-        extra = "allow"
+# 환경변수
 
-
-settings = Settings()
+SECRET_KEY = os.getenv("SECRET_KEY", "secret")
+DB_URL = os.getenv("DB_URL", "")
