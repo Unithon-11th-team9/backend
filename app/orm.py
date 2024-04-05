@@ -13,9 +13,11 @@ class User(TimestampBase):
     )
     uid: Mapped[str] = mapped_column(sa.String(128), nullable=False, unique=True)
     provider: Mapped[str] = mapped_column(sa.String(128), nullable=False)
-    name: Mapped[str] = mapped_column(sa.String(100), nullable=False)
-    email: Mapped[str] = mapped_column(sa.Text, nullable=True, default=None)
-    profile_image_url: Mapped[str] = mapped_column(
+    name: Mapped[str | None] = mapped_column(
+        sa.String(100), nullable=True, default=None
+    )
+    email: Mapped[str | None] = mapped_column(sa.Text, nullable=True, default=None)
+    profile_image_url: Mapped[str | None] = mapped_column(
         sa.Text, nullable=True, server_default=None
     )
 

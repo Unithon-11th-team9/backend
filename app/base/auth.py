@@ -49,7 +49,7 @@ def _set_cookie(response: Response, key: str, value: str) -> None:
         key=key,
         value=value,
         max_age=60 * 60 * 24 * 30,  # 30일
-        domain="localhost",  # TODO: 클라이언트 도메인으로 변경 예정
+        # domain="", # 도메인을 추가하면 해당 도메인에서만 쿠키를 받을 수 있음.
         path="/",
         httponly=True,
         secure=True,
