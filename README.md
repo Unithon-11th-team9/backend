@@ -112,6 +112,7 @@ scripts/dev.sh
 ```
 
 <br><br>
+
 ## Deployment
 main 브랜치에 새로운 push가 일어날 때마다, Github Actions를 통해 자동으로 배포가 이루어집니다.
 
@@ -126,3 +127,24 @@ http://0.0.0.0:8000/docs
 ```
 http://0.0.0.0:8000/redoc
 ```
+
+<br><br>
+
+## Migration
+alembic 과 manage.py 를 이용하여 migration 합니다.
+
+makemigrations(versions) 파일 생성 명령어
+```py
+python manage.py makemigrations
+```
+
+migrate(upgrade) 실행 명령어
+```py
+python manage.py migrate
+```
+
+downgrade 실행 명령어
+```py
+python manage.py downgrade
+```
+
