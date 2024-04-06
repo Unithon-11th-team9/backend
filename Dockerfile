@@ -18,4 +18,4 @@ COPY . .
 
 EXPOSE 8000
 
-ENTRYPOINT ["poetry", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0"]
+ENTRYPOINT ["poetry", "run", "uvicorn", "app.main:app"]
