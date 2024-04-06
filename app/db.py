@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any
 import httpx
 from supabase_py_async import create_client
@@ -12,9 +13,11 @@ SUPABASE_HEADERS = {
 }
 
 
-async def save_to_result(result: dict[str, Any], char_count: int) -> None:
-    """분석 결과를 저장합니다."""
+async def create_result(result: dict[str, Any], char_count: int) -> int:
+    """분석 결과를 생성합니다."""
+    id = int(datetime.now().timestamp() * 1000)
     data = {
+        "id": id,
         "analysis_result": result,
         "analysis_char_count": char_count,
     }
@@ -24,10 +27,22 @@ async def save_to_result(result: dict[str, Any], char_count: int) -> None:
             headers=SUPABASE_HEADERS,
             json=data,
         )
+    return id
+
+
+async def get_result(peace_award_id: int) -> dict[str, Any]:
+    """분석 결과를 조회합니다."""
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"{SUPABASE_URL}/rest/v1/peace_award_result?id=eq.{peace_award_id}",
+            headers=SUPABASE_HEADERS,
+        )
+    return response.json()[0]["analysis_result"]
 
 
 async def fetch_analysis_statistics() -> dict[str, Any]:
     """
+    현재까지의 분석 통계를 응답합니다.
     total_char_count: 'analysis_char_count' 컬럼의 총합
     total_result_count: 'analysis_result' 컬럼의 총 개수
     """

@@ -9,14 +9,13 @@ from app.base.utils import send_message
 from app.dto import AnalysisStatistics, PeaceAwardOutput
 from app.exceptions import ValidationError
 from app.prompt import get_peace_award
-from app.db import save_to_result
 
 router = APIRouter()
 
 
-@router.post("/peace-award", response_model=PeaceAwardOutput, status_code=200)
-async def peace_award(file: UploadFile = File(...)) -> PeaceAwardOutput:
-    """대화내용에 대한 평화상 데이터를 응답합니다."""
+@router.post("/peace-award", status_code=200)
+async def evaluate_peace_award(file: UploadFile = File(...)) -> int:
+    """대화내용에 대한 평화상 심사를 요청하여 id를 받는다."""
     file_extension = file.filename.split(".")[-1]  # type: ignore
     start_index = -10000  # 속도를 위해 최근 10000자 미만으로 요청
 
@@ -66,14 +65,22 @@ async def peace_award(file: UploadFile = File(...)) -> PeaceAwardOutput:
 
     result = await get_peace_award(chat_content)
     try:
-        await save_to_result(
+        result_id = await db.create_result(
             result=result.model_dump(mode="json"), char_count=len(chat_content)
         )
+        return result_id
     except Exception:
         send_message(str(traceback.format_exc()))
-        # 저장은 로그용이므로 실패해도 결과는 반환합니다.
-        pass
-    return result
+        raise ValidationError("분석 결과 저장 중 오류가 발생했습니다.")
+
+
+@router.get(
+    "/peace-award/{peace_award_id}", response_model=PeaceAwardOutput, status_code=200
+)
+async def get_peace_award_result(peace_award_id: int) -> PeaceAwardOutput:
+    """현재까지의 분석 통계를 응답합니다."""
+    peace_award = await db.get_result(peace_award_id)
+    return PeaceAwardOutput(**peace_award)
 
 
 @router.get("/analysis-statistics", response_model=AnalysisStatistics, status_code=200)
