@@ -65,6 +65,7 @@ jobs:
           
             export CREDENTIAL_ALGORITHM=${{ secrets.CREDENTIAL_ALGORITHM }}
             export CREDENTIAL_SECRET=${{ secrets.CREDENTIAL_SECRET }}
+            export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
             
             docker pull ${{ secrets.DOCKER_REPOSITORY }}:latest
             

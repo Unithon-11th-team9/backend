@@ -7,7 +7,10 @@ from app.base.utils import send_message
 from app.dto import PeaceAwardOutput
 from app.exceptions import ValidationError
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+from app.base import config
+
+
+client = OpenAI(api_key=config.OPENAI_API_KEY)
 
 
 def get_peace_award(chat_content: str) -> PeaceAwardOutput:
