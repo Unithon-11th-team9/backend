@@ -10,12 +10,12 @@ RUN apt-get install -y git
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
 # ----- builder-base ----- #
-RUN python3.11 -m pip install pip --upgrade && pip install poetry==1.5.0
-COPY poetry.lock pyproject.toml  ./
-RUN poetry install
+RUN python3.11 -m pip install pip --upgrade
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
 COPY . .
 
 EXPOSE 8000
 
-ENTRYPOINT ["poetry", "run", "uvicorn", "app.main:app"]
+ENTRYPOINT ["uvicorn", "app.main:app", "--host", "0.0.0.0"]

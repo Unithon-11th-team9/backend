@@ -69,5 +69,5 @@ jobs:
             docker pull ${{ secrets.DOCKER_REPOSITORY }}:latest
             
             docker run \
-            -d -p 80:8000 \
+            -d -p 8000:8000 \
             ${{ secrets.DOCKER_REPOSITORY }}:latest
