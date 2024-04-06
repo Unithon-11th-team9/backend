@@ -1,12 +1,16 @@
-import csv
 import json
 import os
+import traceback
 from openai import OpenAI
+
+from app.base.utils import send_message
+from app.dto import PeaceAwardOutput
+from app.exceptions import ValidationError
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
-def main():
+def get_peace_award(chat_content: str) -> PeaceAwardOutput:
     instructions = """
 - 너는 날짜, 발화자, 문자메시지 내용을 토대로 관계의 평화를 분석하는 장난꾸러기야.
 - 너에게 날짜, 발화자, 문자메시지 내용을 보내줄거야. 내용을 토대로 `평화 점수`와 `전체 대화 내용 요약`, `각 발화자의 mbti 분석`을 해줘. 구체적인 내용은 아래 내용을 참고해.
@@ -48,13 +52,16 @@ def main():
     (Response: {"peace_score": {"백인혁": 73, "김송": 34} "summary": "야~ 이 친구들 목표 달성하려고 콕 집어서 계획 다지고 살피네? 재밌는 일도 하고 서로 밀어주고!", "mbti_analysis": {"E": "백인혁", "I": "김송"})
     """
     try:
-        chat_contents = get_chat_contents()
+        # chat_content = get_chat_content() # 테스트용 코드입니다.
         response = client.chat.completions.create(
-            model="gpt-4-turbo-preview",
             # model="gpt-3.5-turbo-16k",
+            model="gpt-4-turbo-preview",
             messages=[
                 {"role": "system", "content": instructions},
-                {"role": "user", "content": chat_contents},
+                {
+                    "role": "user",
+                    "content": chat_content[-15000:],
+                },  # TODO: 15000자 이상은 분리 필요
             ],
             n=5,
             response_format={"type": "json_object"},
@@ -65,24 +72,25 @@ def main():
         ]
         content = json.loads(response.choices[0].message.content)
         content["summary"] = summaries
-        return content
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return None
+        return PeaceAwardOutput(**content)
+    except Exception:
+        send_message(str(traceback.format_exc()))
+        raise ValidationError("대화내용 분석 중에 오류가 발생했습니다.")
 
 
-def get_chat_contents():
-    with open("sample/sample001.csv", mode="r", encoding="utf-8") as f:
-        reader = csv.reader(f, quoting=csv.QUOTE_ALL)
-        data = list(reader)
-    chat_contents = "\n".join([" ".join(row) for row in data])
-    return chat_contents[-15000:]
+# 아래는 테스트용 코드입니다.
+# def get_chat_content():
+#     with open("secrets/sample/sample001.csv", mode="r", encoding="utf-8") as f:
+#         reader = csv.reader(f, quoting=csv.QUOTE_ALL)
+#         data = list(reader)
+#     chat_content = "\n".join([" ".join(row) for row in data])
+#     return chat_content[-15000:]
 
-    # with open(f"sample/sample002.txt", mode="r", encoding="utf-8") as f:
-    #     chat_contents = f.read()
-    # return chat_contents
+#     with open(f"sample/sample002.txt", mode="r", encoding="utf-8") as f:
+#         chat_content = f.read()
+#     return chat_content
 
 
-if __name__ == "__main__":
-    a = main()
-    print(a)
+# if __name__ == "__main__":
+#     a = main()
+#     print(a)
