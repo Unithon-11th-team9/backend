@@ -47,5 +47,5 @@ def msepoch_to_datetime(ms: float, tz: str = "UTC") -> datetime:
 
 def send_message(msg: str) -> None:
     """메시지를 디스코드로 보낸다."""
-    message = {"content": f"[{tz_now().strftime('%Y-%m-%d %H:%M:%S')}] {msg}"}
+    message = {"content": msg}
     requests.post(DISCORD_WEBHOOK_URL, data=message)
