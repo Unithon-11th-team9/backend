@@ -69,4 +69,6 @@ jobs:
             -d -p 8000:8000 \
             -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
             -e DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK_URL }} \
+            -e SUPABASE_KEY=${{ secrets.SUPABASE_KEY }} \
+            -e SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
             ${{ secrets.DOCKER_REPOSITORY }}:latest
