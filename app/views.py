@@ -1,9 +1,10 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File
 import zipfile
 import csv
 import io
 
 from app.dto import PeaceAwardOutput
+from app.exceptions import ValidationError
 from app.prompt import get_peace_award
 
 router = APIRouter()
@@ -26,9 +27,7 @@ async def peace_award(file: UploadFile = File(...)) -> PeaceAwardOutput:
                             text_contents.append(f.read().decode("utf-8"))
                 return get_peace_award("\n".join(text_contents))
         except Exception as e:
-            raise HTTPException(
-                status_code=400, detail=f"ZIP 파일 처리 중 오류 발생: {e}"
-            )
+            raise ValidationError(f"ZIP 파일 처리 중 오류 발생: {e}")
 
     elif file_extension == "csv":
         # CSV 파일 처리
@@ -38,9 +37,7 @@ async def peace_award(file: UploadFile = File(...)) -> PeaceAwardOutput:
             rows = [",".join(row) for row in csv_reader]
             return get_peace_award("\n".join(rows))
         except Exception as e:
-            raise HTTPException(
-                status_code=400, detail=f"CSV 파일 처리 중 오류 발생: {e}"
-            )
+            raise ValidationError(f"CSV 파일 처리 중 오류 발생: {e}")
 
     elif file_extension == "txt":
         # TXT 파일 처리
@@ -48,4 +45,4 @@ async def peace_award(file: UploadFile = File(...)) -> PeaceAwardOutput:
         return get_peace_award(content.decode("utf-8"))
 
     else:
-        raise HTTPException(status_code=400, detail="지원하지 않는 파일 형식입니다.")
+        raise ValidationError("지원하지 않는 파일 형식입니다.")
