@@ -62,13 +62,11 @@ jobs:
             docker stop $(docker ps -a -q)         
             
             export DB_URL = ${{ secrets.DB_URL }}
-          
-            export CREDENTIAL_ALGORITHM=${{ secrets.CREDENTIAL_ALGORITHM }}
-            export CREDENTIAL_SECRET=${{ secrets.CREDENTIAL_SECRET }}
-            export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
             
             docker pull ${{ secrets.DOCKER_REPOSITORY }}:latest
             
             docker run \
             -d -p 8000:8000 \
+            -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
+            -e DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK_URL }} \
             ${{ secrets.DOCKER_REPOSITORY }}:latest
