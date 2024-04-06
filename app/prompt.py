@@ -1,7 +1,9 @@
 # from datetime import datetime
 import json
+import traceback
 from openai import AsyncOpenAI
 
+from app.base.utils import send_message
 from app.dto import PeaceAwardOutput
 from app.exceptions import ValidationError
 
@@ -54,7 +56,6 @@ async def get_peace_award(chat_content: str) -> PeaceAwardOutput:
     (Response: {"peace_score": {"박지훈": 42, "김재현": 80, "이승훈": 85, "김동현": 87, "이승준": 88, "김동현": 84}, "summary": "엄청 재밌는 일들 많았고, 모두가 진짜 알차게 놀았어~", "mbti_analysis": {"E": "박지훈", "I": "김동현", "F": "이승훈", "T": "김동현"}})
     """
     try:
-        # chat_content = get_chat_content() # 테스트용 코드입니다.
         response = await client.chat.completions.create(
             # model="gpt-3.5-turbo-16k",
             model="gpt-4-turbo-preview",
@@ -62,8 +63,8 @@ async def get_peace_award(chat_content: str) -> PeaceAwardOutput:
                 {"role": "system", "content": instructions},
                 {
                     "role": "user",
-                    "content": chat_content[-10000:],
-                },  # TODO: 속도를 위해 최근 10000자 미만으로 요청
+                    "content": chat_content,
+                },
             ],
             n=5,
             response_format={"type": "json_object"},
@@ -77,22 +78,5 @@ async def get_peace_award(chat_content: str) -> PeaceAwardOutput:
         # print(f"실행 시간: {datetime.now() - start_time}")
         return res
     except Exception as e:
+        send_message(str(traceback.format_exc()))
         raise ValidationError("대화내용 분석 중에 오류가 발생했습니다.") from e
-
-
-# 아래는 테스트용 코드입니다.
-# def get_chat_content():
-#     with open("secrets/sample/sample001.csv", mode="r", encoding="utf-8") as f:
-#         reader = csv.reader(f, quoting=csv.QUOTE_ALL)
-#         data = list(reader)
-#     chat_content = "\n".join([" ".join(row) for row in data])
-#     return chat_content[-15000:]
-
-#     with open(f"sample/sample002.txt", mode="r", encoding="utf-8") as f:
-#         chat_content = f.read()
-#     return chat_content
-
-
-# if __name__ == "__main__":
-#     a = main()
-#     print(a)

@@ -39,3 +39,14 @@ class PeaceAwardOutput(BaseModel):
             }
         ],
     )
+
+
+class AnalysisStatistics(BaseModel):
+    total_char_count: int = Field(
+        description="분석된 문자열의 총 개수",
+        examples=[588273],
+    )
+    total_result_count: int = Field(
+        description="분석된 결과의 총 개수",
+        examples=[82],
+    )
