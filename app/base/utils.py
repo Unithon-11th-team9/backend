@@ -1,6 +1,10 @@
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
+import requests
+
+from app.base.config import DISCORD_WEBHOOK_URL
+
 
 def tz_now(tz: str = "UTC") -> datetime:
     """타임존이 포함된 현재시간을 반환합니다.
@@ -39,3 +43,9 @@ def msepoch_to_datetime(ms: float, tz: str = "UTC") -> datetime:
         Aware Datetime객체
     """
     return datetime.fromtimestamp(ms / 1000, tz=ZoneInfo(tz))
+
+
+def send_message(msg: str) -> None:
+    """메시지를 디스코드로 보낸다."""
+    message = {"content": f"[{tz_now().strftime('%Y-%m-%d %H:%M:%S')}] {msg}"}
+    requests.post(DISCORD_WEBHOOK_URL, data=message)
