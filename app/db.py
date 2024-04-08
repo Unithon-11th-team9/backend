@@ -54,6 +54,8 @@ async def fetch_analysis_statistics() -> dict[str, Any]:
     response = (
         await client.table("peace_award_result")
         .select("analysis_char_count", "analysis_result")
+        # 4월 7일 오전 10시 이후 데이터만 조회(제품 공개 이후 데이터)
+        .gt("created_at", "2024-04-07 01:00:00.00000+00")
         .execute()
     )
     data = response.data
