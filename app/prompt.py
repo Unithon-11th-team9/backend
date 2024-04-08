@@ -16,11 +16,14 @@ client = AsyncOpenAI(api_key=config.OPENAI_API_KEY)
 async def get_peace_award(chat_content: str) -> PeaceAwardOutput:
     # start_time = datetime.now()
     instructions = """
+🌸<//// 특정분야의 전문가로 설정하기>
 - 너는 날짜, 발화자, 문자메시지 내용을 토대로 관계의 평화를 분석하는 전문가야.
 - 너에게 날짜, 발화자, 문자메시지 내용을 보내줄거야. 내용을 토대로 `평화 점수`와 `전체 대화 내용 요약`, `각 발화자의 mbti 분석`을 해줘. 구체적인 내용은 아래 내용을 참고해.
 
+🌸<//// 형식을 갖추어 주제와 내용 구분하기>
 ### `평화 점수`
 
+🌸<//// 지시사항을 차근차근 나열하여 설명하기>
 - 각 발화자별로 `칭찬/긍정 점수`에 `욕설/부정 점수`를 빼서 `평화 점수`를 계산해줘.
 - `칭찬/긍정 점수`는 해당 발화자의 대화 중 다른 사람에게 긍정적인 말을 한 점수야.
 - `욕설/부정 점수`는 해당 발화자의 대화 중 방어적이고 부정적인 말을 한 점수야.
@@ -29,8 +32,10 @@ async def get_peace_award(chat_content: str) -> PeaceAwardOutput:
 - 평화 점수를 산정할 때, 화자가 서로의 감정을 좋게 만들기 위해 노력했는지를 보아야 해, 예를 들어, 영희가 "우리 모두 힘내자"라고 말하거나, "화이팅이이야"라고 이야기한다면 그런 노력을 시행한 것이겠지? 그렇다면 평화 점수를 높이 줄 수 있어
 - 평화 점수의 분포가 0부터 100점까지 고르게 분포하게 만들어야 해 (모든 참여자가 90점을 넘지 않게 해 줘)
 
+
 ### `전체 대화 내용 요약`
 
+🌸<//// 특정 역할과 예시를 첨부하여 구체적인 요구사항 전달하기>
 - 전체 대화 내용을 5개 버전으로 만들어서 각각 한글 70자 이내로 요약해줘.
 - 1번째 버전은 장난꾸러기 말투야. 예를 들어 '클라스 보소' '와우~' '실화냐?' 처럼.
 - 2번째 버전은 부처님 말투야. 예를 들어 '그대들의 이야기는~' '~참으로 감동적이구나' '평안하기를.' 처럼.
@@ -40,23 +45,28 @@ async def get_peace_award(chat_content: str) -> PeaceAwardOutput:
 - 전체 대화 내용 5개는 배열에 담아 반환해줘.
 
 ### `각 발화자의 mbti 분석`
-<대화수 기준 상대평가>
+
+🌸<//// 명확한 조건 제시하기>
+대화수 기준 상대평가
 - E : 가장 많이 대화한 사람
 - I : 가장 적게 대화한 사람
 
-<공감 대화 비율 상대평가>
+공감 대화 비율 상대평가
 - F : 공감의 대화 비율이 가장 높은 사람
 - T : 공감의 대화 비율이 가장 낮은 사람
 
-<주의 사항>
+주의 사항
 - E와 I 결과 중복 불가
 - F와 T 결과 중복 불가
 
 ### 답변
 
+🌸<//// 최종 답변에 대한 요청사항을 명확히 제시하기>
 - 답변은 `평화 점수`와 `전체 대화 내용 요약`, `각 발화자의 mbti 분석` 을 json 형식으로 답변해줘
 - 답변 내용은 모두 한글로 답변해주고, `전체 대화 내용 요약` 항목은 반드시 5개 문장의 배열 형태로 반환해야해.
 - 각 발화가 어떤 말을 했는지 반드시 언급해줘. 예를 들어 '홍길동은 돈이 없어서 짜증나고, 장길산은 아이돌에 빠졌으며, 김민교는 주로 그들의 이야기를 듣고 위로해주는 대화' 처럼.
+
+🌸<//// 예시 답변을 제공하여 명확한 형식의 답변 요구하기>
   예시1.
     (Response: {
         "peace_score": {"홍길동": 83, "장길산": 57, "장득현": 94, "백민후": 59},
@@ -114,7 +124,6 @@ async def get_peace_award(chat_content: str) -> PeaceAwardOutput:
     """
     try:
         response = await client.chat.completions.create(
-            # model="gpt-3.5-turbo-16k",
             model="gpt-4-turbo-preview",
             messages=[
                 {"role": "system", "content": instructions},
@@ -123,17 +132,11 @@ async def get_peace_award(chat_content: str) -> PeaceAwardOutput:
                     "content": chat_content,
                 },
             ],
-            n=5,
             temperature=0.7,
             response_format={"type": "json_object"},
         )
-        # summaries = [
-        #     json.loads(choice.message.content)["summary"] for choice in response.choices
-        # ]
         content = json.loads(response.choices[0].message.content)
-        # content["summary"] = summaries
         res = PeaceAwardOutput(**content)
-        # print(f"실행 시간: {datetime.now() - start_time}")
         return res
     except Exception as e:
         send_message(str(traceback.format_exc()))
